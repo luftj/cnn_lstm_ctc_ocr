@@ -48,8 +48,13 @@ def _get_image( filename ):
 
     image = Image.open( filename ) 
     image = np.array( image )
+    print("get Image shape",filename,np.shape(image),len(np.shape(image)))
     # in mjsynth, all three channels are the same in these grayscale-cum-RGB data
-    image = image[:,:,:1] # so just extract first channel, preserving 3D shape
+    if len(np.shape(image)) == 3:
+        image = image[:,:,:1] # so just extract first channel, preserving 3D shape
+    else:
+        image = image[..., np.newaxis]
+#        image = np.reshape(image,list((np.shape(image)))+[1])
 
     return image
 
