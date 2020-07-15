@@ -42,9 +42,11 @@ tf.app.flags.DEFINE_float( 'lexicon_prior',None,
 
 tf.logging.set_verbosity( tf.logging.INFO )
 
+files = []
 
 def _get_image( filename ):
     """Load image data for placement in graph"""
+    files.append(filename)
 
     image = Image.open( filename ) 
     image = np.array( image )
@@ -57,15 +59,11 @@ def _get_image( filename ):
 
     return image
 
-filename = ""
-
 def _get_input():
     """Create a dataset of images by reading from stdin"""
     
-    global filename
-    filename = raw_input().rstrip()
     # Eliminate any trailing newline from filename
-    image_data = _get_image( filename )
+    image_data = _get_image( raw_input().rstrip() )
 
     # Initializing the dataset with one image
     dataset = tf.data.Dataset.from_tensors( image_data )
@@ -117,7 +115,7 @@ def main(argv=None):
                 print pred_str, results['score'][0]
             else:
                 print pred_str
-            output.append((filename,pred_str,results['score']))
+            output.append((files[len(output)],pred_str,results['score'][0]))
         except StopIteration:
             print(output)
             sys.exit()
