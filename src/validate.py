@@ -48,7 +48,6 @@ def _get_image( filename ):
 
     image = Image.open( filename ) 
     image = np.array( image )
-    print("get Image shape",filename,np.shape(image),len(np.shape(image)))
     # in mjsynth, all three channels are the same in these grayscale-cum-RGB data
     if len(np.shape(image)) == 3:
         image = image[:,:,:1] # so just extract first channel, preserving 3D shape
@@ -58,12 +57,15 @@ def _get_image( filename ):
 
     return image
 
+filename = ""
 
 def _get_input():
     """Create a dataset of images by reading from stdin"""
-
+    
+    global filename
+    filename = raw_input().rstrip()
     # Eliminate any trailing newline from filename
-    image_data = _get_image( raw_input().rstrip() )
+    image_data = _get_image( filename )
 
     # Initializing the dataset with one image
     dataset = tf.data.Dataset.from_tensors( image_data )
@@ -103,7 +105,8 @@ def main(argv=None):
                                          model_dir=FLAGS.model )
     
     predictions = classifier.predict( input_fn=_get_input )
-    
+
+    output = []
     # Get all the predictions in string format
     while True:
         try:
@@ -114,7 +117,9 @@ def main(argv=None):
                 print pred_str, results['score'][0]
             else:
                 print pred_str
+            output.append((filename,pred_str,results['score']))
         except StopIteration:
+            print(output)
             sys.exit()
     
 if __name__ == '__main__':
